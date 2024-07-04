@@ -24,7 +24,7 @@ public class MyNeuroph implements LearningEventListener {
         DataSet dataSet = getDataSet(inputsCount, outputsCount);
 
         System.out.println("Creating neural network...");
-        MultiLayerPerceptron neuralNet = new MultiLayerPerceptron(inputsCount, 25, outputsCount);
+        MultiLayerPerceptron neuralNet = new MultiLayerPerceptron(inputsCount, 10, 10, 10,outputsCount);
 
         // attach listener to learning rule
         MomentumBackpropagation learningRule = (MomentumBackpropagation) neuralNet.getLearningRule();
@@ -83,7 +83,7 @@ public class MyNeuroph implements LearningEventListener {
 
         DataSet ds = new DataSet(inputCount, outputCount);
         Random random = new Random();
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 1000; i++) {
             double d1 = random.nextDouble();
             double d2 = random.nextDouble();
             double result = testFunction(d1, d2);

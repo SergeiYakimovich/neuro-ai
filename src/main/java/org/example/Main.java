@@ -1,16 +1,13 @@
 package org.example;
 
-import org.example.neuroph.MyNeuroph;
-import org.neuroph.core.NeuralNetwork;
-import org.neuroph.core.data.DataSet;
-import org.neuroph.nnet.MultiLayerPerceptron;
+import org.example.tgbot.BotInitializer;
+import org.example.tgbot.TelegramBot;
 
-import java.util.Random;
-
-import static org.example.neuroph.BinaryOperationsNeuroph.*;
+import java.io.IOException;
 
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException, InterruptedException {
+        // Neural Network
 //        NeuralNetwork network = handleAssembleNeuralNetwork();
 //        network = trainXOR(network);
 //        testNeuralNetwork(network, 0, 0);
@@ -18,12 +15,20 @@ public class Main {
 //        testNeuralNetwork(network, 1, 0);
 //        testNeuralNetwork(network, 1, 1);
 
-        MyNeuroph myNeuroph = new MyNeuroph(2, 1);
+//        MyNeuroph myNeuroph = new MyNeuroph(2, 1);
 //        myNeuroph.run();
 
-        NeuralNetwork neuralNetwork = MultiLayerPerceptron.createFromFile("MyNeuralNet.nnet");
-        DataSet dataSet = myNeuroph.getDataSet(2, 1);
-        myNeuroph.testNeuralNetwork(neuralNetwork, dataSet);
+//        NeuralNetwork neuralNetwork = MultiLayerPerceptron.createFromFile("MyNeuralNet.nnet");
+//        DataSet dataSet = myNeuroph.getDataSet(2, 1);
+//        myNeuroph.testNeuralNetwork(neuralNetwork, dataSet);
+
+
+        //TG Bot
+        new BotInitializer(new TelegramBot()).init();
+
+        // Yandex GPT
+//        String result = YandexGptSender.sendMessage("Переведи текст","To be, or not to be: that is the question.");
+//        System.out.println(result);
 
     }
 

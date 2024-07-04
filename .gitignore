@@ -11,3 +11,6 @@ bin
 
 libs/
 .gitignore
+
+*.log
+*.nnet
