@@ -11,14 +11,36 @@ import org.neuroph.nnet.MultiLayerPerceptron;
 import org.neuroph.nnet.learning.BackPropagation;
 import org.neuroph.nnet.learning.MomentumBackpropagation;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Random;
 
 @Data
 @AllArgsConstructor
 public class MyNeuroph implements LearningEventListener {
+    private static final String FILE_NAME = "src/main/resources/MyNeuralNet.nnet";
     private int inputsCount;
     private int outputsCount;
+
+    public static void main(String[] args) throws IOException, InterruptedException {
+        // Neural Network
+//        NeuralNetwork network = handleAssembleNeuralNetwork();
+//        network = trainXOR(network);
+//        testNeuralNetwork(network, 0, 0);
+//        testNeuralNetwork(network, 0, 1);
+//        testNeuralNetwork(network, 1, 0);
+//        testNeuralNetwork(network, 1, 1);
+
+//        MyNeuroph myNeuroph = new MyNeuroph(2, 1);
+//        myNeuroph.run();
+
+        MyNeuroph myNeuroph = new MyNeuroph(2, 1);
+        NeuralNetwork neuralNetwork = MultiLayerPerceptron.createFromFile(FILE_NAME);
+        DataSet dataSet = myNeuroph.getDataSet(2, 1);
+        myNeuroph.testNeuralNetwork(neuralNetwork, dataSet);
+
+    }
+
     public void run() {
         System.out.println("Creating training set...");
         DataSet dataSet = getDataSet(inputsCount, outputsCount);
@@ -43,7 +65,7 @@ public class MyNeuroph implements LearningEventListener {
         testNeuralNetwork(neuralNet, dataSet);
 
         System.out.println("Saving network");
-        neuralNet.save("MyNeuralNet.nnet");
+        neuralNet.save(FILE_NAME);
 
         System.out.println("Done");
     }

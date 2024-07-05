@@ -7,11 +7,19 @@ version = "1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
+//    maven(uri("https://releases.aspose.com/java/repo/"))
+
+//    flatDir { dirs("libs") }
 }
 
 dependencies {
     implementation("org.beykery:neuroph:2.92")
 
+    implementation(files("libs/aspose-ocr-24.6.1.jar"))
+    implementation("com.microsoft.onnxruntime:onnxruntime:1.16.0")
+//    implementation("com.aspose:aspose-pdf:24.2")
+
+    implementation("net.sourceforge.tess4j:tess4j:4.5.1")
 
     implementation(platform("ai.djl:bom:0.28.0"))
     implementation("ai.djl.pytorch:pytorch-model-zoo")

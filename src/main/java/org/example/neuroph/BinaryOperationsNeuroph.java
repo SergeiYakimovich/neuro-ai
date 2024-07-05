@@ -11,7 +11,6 @@ import org.neuroph.util.ConnectionFactory;
 import org.neuroph.util.NeuralNetworkType;
 
 import java.util.Arrays;
-import java.util.Random;
 
 public class BinaryOperationsNeuroph {
 

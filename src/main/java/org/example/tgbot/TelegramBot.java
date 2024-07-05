@@ -1,17 +1,21 @@
 package org.example.tgbot;
 
 import lombok.extern.slf4j.Slf4j;
-import org.example.yandexgpt.YandexGptSender;
+import org.example.aspose.AsposeExtractor;
+import org.example.tesseract.TesseractExtractor;
+import org.example.yandexgpt.YandexGptImageSender;
+import org.example.yandexgpt.YandexGptTextSender;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.methods.GetFile;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
-import org.telegram.telegrambots.meta.api.objects.InputFile;
-import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.*;
 import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScopeDefault;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import static org.example.tgbot.BotCommands.*;
 
@@ -21,6 +25,8 @@ public class TelegramBot extends TelegramLongPollingBot {
     // t.me/SergeiYakimovichBot
     private final String botName = "SergeiYakimovichBot";
     private final String token = "6872664139:AAHTlfBNB8u5EnITEtmnknVSi39b7ykLFmc";
+    public static final String OUTPUT_DIR = "out/";
+
     @Override
     public String getBotUsername() {
         return botName;
@@ -31,53 +37,87 @@ public class TelegramBot extends TelegramLongPollingBot {
         return token;
     }
 
-    public TelegramBot(){
+    public TelegramBot() {
         try {
             this.execute(new SetMyCommands(LIST_OF_COMMANDS, new BotCommandScopeDefault(), null));
-        } catch (TelegramApiException e){
-            e.printStackTrace();
+        } catch (TelegramApiException e) {
+            log.error("Error creating bot " + e.getMessage());
+            throw new RuntimeException(e);
         }
     }
 
     @Override
     public void onUpdateReceived(Update update) {
-        long chatId = 0;
-        String messageText = "";
-        String userName = "";
-
-        if(update.hasMessage() && update.getMessage().hasText()) {
-            chatId = update.getMessage().getChatId();
-            messageText = update.getMessage().getText();
-            userName = update.getMessage().getChat().getFirstName();
-        } else if (update.hasCallbackQuery()) {
-            chatId = update.getCallbackQuery().getMessage().getChatId();
-            userName = update.getCallbackQuery().getFrom().getFirstName();
-            messageText = update.getCallbackQuery().getData();
+        if (update.hasMessage() && update.getMessage().hasPhoto()) {
+            handleMessagePhoto(update.getMessage());
+            return;
         }
 
-        switch (messageText) {
-            case "/start" -> sendMessage(chatId, START_TEXT.formatted(userName));
-            case "/help" -> sendMessage(chatId, HELP_TEXT);
-            case "/foto" -> sendFoto(chatId);
-            default -> sendMessage(chatId, YandexGptSender.sendMessage("Переведи текст", messageText));
+        if (update.hasMessage() && update.getMessage().hasText()) {
+            long chatId = update.getMessage().getChatId();
+            String userName = update.getMessage().getChat().getFirstName();
+            String messageText = update.getMessage().getText();
+
+            handleMessageText(chatId, userName, messageText);
+            return;
         }
 
+        if (update.hasCallbackQuery()) {
+            long chatId = update.getCallbackQuery().getMessage().getChatId();
+            String userName = update.getCallbackQuery().getFrom().getFirstName();
+            String messageText = update.getCallbackQuery().getData();
+
+            handleMessageText(chatId, userName, messageText);
+        }
     }
 
-    private void sendFoto(long chatId) {
+    private void handleMessagePhoto(Message message) {
+        try {
+            long chatId = message.getChatId();
+            PhotoSize photo = message.getPhoto().get(0);
+            GetFile getFile = new GetFile(photo.getFileId());
+            File file = execute(getFile);
+            String fileName = OUTPUT_DIR + file.getFileId() + ".jpg";
+            downloadFile(file, new java.io.File(fileName));
+
+//            String result = YandexGptImageSender.sendImageMessageToGPT(fileName);
+
+            String result = AsposeExtractor.recognizeText(fileName);
+
+//            String result = TesseractExtractor.recognizeText(fileName);
+
+            sendTextToTelegram(chatId, "На картинке изображено: " + result);
+            Files.delete(Path.of(fileName));
+        } catch (Exception e) {
+            log.error("Error handling photo " + e.getMessage());
+        }
+    }
+
+    private void handleMessageText(long chatId, String userName, String messageText) {
+        switch (messageText) {
+            case START_COMMAND -> sendTextToTelegram(chatId, START_TEXT.formatted(userName));
+            case HELP_COMMAND -> sendTextToTelegram(chatId, HELP_TEXT);
+            case FOTO_COMMAND -> sendPhotoToTelegram(chatId);
+            default ->
+                    sendTextToTelegram(chatId, YandexGptTextSender.sendTextMessageToGPT("Переведи текст", messageText));
+        }
+    }
+
+    private void sendPhotoToTelegram(long chatId) {
+        log.info("Sending photo to Telegram");
         try {
             SendPhoto sendPhoto = SendPhoto.builder()
                     .chatId(chatId)
-                    .photo(new InputFile(new File("src/main/resources/rose.bmp")))
+                    .photo(new InputFile(new java.io.File("src/main/resources/rose.bmp")))
                     .build();
             execute(sendPhoto);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Error while sending photo to Telegram " + e.getMessage());
         }
     }
 
-    private void sendMessage(Long chatId, String textToSend){
-        log.info("Sending message: {}",textToSend);
+    private void sendTextToTelegram(Long chatId, String textToSend) {
+        log.info("Sending message to Telegram: {}", textToSend);
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
         sendMessage.setText(textToSend);
@@ -86,8 +126,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         try {
             execute(sendMessage);
         } catch (TelegramApiException e) {
-            log.error("Error while sending message {}", e.getMessage());
-            e.printStackTrace();
+            log.error("Error while sending message to Telegram {}", e.getMessage());
         }
     }
 
