@@ -1,10 +1,9 @@
 package org.example.tgbot;
 
 import lombok.extern.slf4j.Slf4j;
-import org.example.aspose.AsposeExtractor;
 import org.example.tesseract.TesseractExtractor;
-import org.example.yandexgpt.YandexGptImageSender;
-import org.example.yandexgpt.YandexGptTextSender;
+import org.example.yandexgpt.YandexGptTaskSender;
+import org.example.yandexgpt.YandexGptTranslateSender;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.GetFile;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
@@ -16,6 +15,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 import static org.example.tgbot.BotCommands.*;
 
@@ -25,7 +25,7 @@ public class TelegramBot extends TelegramLongPollingBot {
     // t.me/SergeiYakimovichBot
     private final String botName = "SergeiYakimovichBot";
     private final String token = "6872664139:AAHTlfBNB8u5EnITEtmnknVSi39b7ykLFmc";
-    public static final String OUTPUT_DIR = "out/";
+    public static final String OUTPUT_DIR = "tmp/";
 
     @Override
     public String getBotUsername() {
@@ -41,7 +41,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         try {
             this.execute(new SetMyCommands(LIST_OF_COMMANDS, new BotCommandScopeDefault(), null));
         } catch (TelegramApiException e) {
-            log.error("Error creating bot " + e.getMessage());
+            log.info("Error creating bot " + e.getMessage());
             throw new RuntimeException(e);
         }
     }
@@ -77,14 +77,14 @@ public class TelegramBot extends TelegramLongPollingBot {
             PhotoSize photo = message.getPhoto().get(0);
             GetFile getFile = new GetFile(photo.getFileId());
             File file = execute(getFile);
-            String fileName = OUTPUT_DIR + file.getFileId() + ".jpg";
+            String fileName = OUTPUT_DIR + file.getFilePath().split("/")[1];
             downloadFile(file, new java.io.File(fileName));
 
 //            String result = YandexGptImageSender.sendImageMessageToGPT(fileName);
 
-            String result = AsposeExtractor.recognizeText(fileName);
+//            String result = AsposeExtractor.recognizeText(fileName);
 
-//            String result = TesseractExtractor.recognizeText(fileName);
+            String result = TesseractExtractor.recognizeText(fileName);
 
             sendTextToTelegram(chatId, "На картинке изображено: " + result);
             Files.delete(Path.of(fileName));
@@ -94,13 +94,30 @@ public class TelegramBot extends TelegramLongPollingBot {
     }
 
     private void handleMessageText(long chatId, String userName, String messageText) {
-        switch (messageText) {
-            case START_COMMAND -> sendTextToTelegram(chatId, START_TEXT.formatted(userName));
-            case HELP_COMMAND -> sendTextToTelegram(chatId, HELP_TEXT);
-            case FOTO_COMMAND -> sendPhotoToTelegram(chatId);
-            default ->
-                    sendTextToTelegram(chatId, YandexGptTextSender.sendTextMessageToGPT("Переведи текст", messageText));
+        if (messageText.startsWith(START_COMMAND)) {
+            sendTextToTelegram(chatId, START_TEXT.formatted(userName));
+            return;
         }
+        if (messageText.startsWith(HELP_COMMAND)) {
+            sendTextToTelegram(chatId, HELP_TEXT);
+            return;
+        }
+        if (messageText.startsWith(FOTO_COMMAND)) {
+            sendPhotoToTelegram(chatId);
+            return;
+        }
+        if (messageText.startsWith(RU_COMMAND)) {
+            sendTextToTelegram(chatId, YandexGptTranslateSender.sendTranslateMessageToGPT("ru",
+                    List.of(messageText.replaceFirst(RU_COMMAND, ""))));
+            return;
+        }
+        if (messageText.startsWith(EN_COMMAND)) {
+            sendTextToTelegram(chatId, YandexGptTranslateSender.sendTranslateMessageToGPT("en",
+                    List.of(messageText.replaceFirst(EN_COMMAND, ""))));
+            return;
+        }
+
+        sendTextToTelegram(chatId, YandexGptTaskSender.sendTaskMessageToGPT("Ответь на вопрос", messageText));
     }
 
     private void sendPhotoToTelegram(long chatId) {
@@ -108,7 +125,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         try {
             SendPhoto sendPhoto = SendPhoto.builder()
                     .chatId(chatId)
-                    .photo(new InputFile(new java.io.File("src/main/resources/rose.bmp")))
+                    .photo(new InputFile(new java.io.File(OUTPUT_DIR + "rose.bmp")))
                     .build();
             execute(sendPhoto);
         } catch (Exception e) {
@@ -117,7 +134,7 @@ public class TelegramBot extends TelegramLongPollingBot {
     }
 
     private void sendTextToTelegram(Long chatId, String textToSend) {
-        log.info("Sending message to Telegram: {}", textToSend);
+        log.info("Sending message to Telegram: "+ textToSend);
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
         sendMessage.setText(textToSend);
@@ -126,7 +143,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         try {
             execute(sendMessage);
         } catch (TelegramApiException e) {
-            log.error("Error while sending message to Telegram {}", e.getMessage());
+            log.error("Error while sending message to Telegram "+ e.getMessage());
         }
     }
 

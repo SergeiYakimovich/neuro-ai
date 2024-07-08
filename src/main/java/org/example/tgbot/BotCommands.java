@@ -8,6 +8,8 @@ public interface BotCommands {
     String START_COMMAND = "/start";
     String HELP_COMMAND = "/help";
     String FOTO_COMMAND = "/foto";
+    String RU_COMMAND = "/ru";
+    String EN_COMMAND = "/en";
     List<BotCommand> LIST_OF_COMMANDS = List.of(
             new BotCommand(START_COMMAND, "start the bot"),
             new BotCommand(HELP_COMMAND, "bot info")
@@ -18,9 +20,11 @@ public interface BotCommands {
             /start - start the bot
             /help - help menu
             /foto - get photo from the bot
+            /ru text - translate text to Russian
+            /en text - translate text to English
             
-            You may send text to translate it to Russian
-            You may send image in JPEG to get text from it
+            You may ask questions to the bot
+            or send image to get text from it
             """;
 
 }

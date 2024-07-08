@@ -2,6 +2,7 @@ package org.example.yandexgpt;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 
 import java.io.IOException;
@@ -13,14 +14,12 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.logging.Logger;
 
+@Slf4j
 public class YandexGptImageSender {
-    private static final Logger log = Logger.getLogger(YandexGptImageSender.class.getName());
-    private static final String TOKEN = "t1.9euelZrPypaNnpfPk5uSlJGTyp6LnO3rnpWax8eJlJrNm5vKl8zPy8qZlpvl9PcMBGZL-e83Lxen3fT3TDJjS_nvNy8Xp83n9euelZqbiomQmo-XmZSbyJyQjI2LyO_8xeuelZqbiomQmo-XmZSbyJyQjI2LyA.ljxD9WRi2dc36l9cs1f54SnwvH5oOiqOHKbLL8x7uWxzWLYPNXPlP-M28FPHDM0Cd67IRjzsFf9nGzSJtcixCA";
     private static final String ENDPOINT = "https://ocr.api.cloud.yandex.net/ocr/v1/recognizeText";
-    private static final String ID = "b1g9gnpghn2con82cedb";
     private static final String IMAGE_TYPE = "JPEG";
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     public static void main(String[] args) throws IOException {
         String encodedImage = readImageFromFile("src/main/resources/2345.jpg");
@@ -42,15 +41,15 @@ public class YandexGptImageSender {
         try {
             String imageContent = readImageFromFile(fileName);
             YandexGptImageRequest yandexGptImageRequest = createImageRequest(IMAGE_TYPE, imageContent);
-            var objectMapper = new ObjectMapper();
+
             String requestBody = objectMapper.writeValueAsString(yandexGptImageRequest);
 
             HttpClient client = HttpClient.newHttpClient();
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(ENDPOINT))
-                    .header("Authorization", "Bearer " + TOKEN)
+                    .header("Authorization", "Bearer " + YandexGptAuth.iamToken)
                     .header("Content-Type", "application/json")
-                    .header("x-folder-id", ID)
+                    .header("x-folder-id", YandexGptAuth.CATALOG_ID)
 //                    .header("x-data-logging-enabled", "true")
                     .POST(HttpRequest.BodyPublishers.ofString(requestBody))
                     .build();
@@ -69,7 +68,7 @@ public class YandexGptImageSender {
             log.info("Received result from GPT: " + result);
         } catch (Exception e) {
             result = "Error while sending image to GPT ";
-            log.info( result + e.getMessage());
+            log.error( result + e.getMessage());
         }
 
         return result;

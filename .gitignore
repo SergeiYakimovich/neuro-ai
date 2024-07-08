@@ -1,18 +1,21 @@
 .gradle/
 .idea/
 build/
-out/
 
 **/logs/
 .settings
 bin
 .project*
 .classpath
+*.log
 
-libs/
 .gitignore
 
-*.log
 *.nnet
 
-
+libs/
+out/
+tessdata/
+aspose_data/
+tmp/
+bot/

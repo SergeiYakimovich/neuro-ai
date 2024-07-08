@@ -5,4 +5,4 @@
 - Aspose OCR
 - Tesseract
 - Yandex GPT
-- Telegram Bot
+- Telegram Bot @SergeiYakimovichBot (https://t.me/SergeiYakimovichBot)

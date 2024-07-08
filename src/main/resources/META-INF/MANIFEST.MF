@@ -1,0 +1,31 @@
+Manifest-Version: 1.0
+Main-Class: org.example.Main
+Class-Path: logback-core-1.1.2.jar slf4j-api-2.0.13.jar junit-jupiter-en
+ gine-5.8.1.jar logback-classic-1.1.2.jar grizzly-framework-2.4.4.jar ht
+ tpcore-4.4.13.jar junit-jupiter-api-5.8.1.jar log4j-slf4j2-impl-2.20.0.
+ jar aopalliance-repackaged-2.6.1.jar jackson-annotations-2.14.0.jar pdf
+ box-io-3.0.2.jar jakarta.annotation-api-1.3.5.jar telegrambots-6.5.0.ja
+ r grizzly-http-server-2.4.4.jar jboss-vfs-3.2.17.Final.jar grizzly-http
+ -2.4.4.jar jersey-entity-filtering-2.35.jar mxnet-engine-0.28.0.jar com
+ mons-logging-1.3.0.jar neuroph-2.92.jar api-0.28.0.jar hk2-locator-2.6.
+ 1.jar jersey-hk2-2.35.jar jboss-logging-3.1.4.GA.jar log4j-slf4j-impl-2
+ .12.1.jar jai-imageio-core-1.4.0.jar onnxruntime-1.17.1.jar aspose-ocr-
+ 24.6.1.jar jersey-container-grizzly2-http-2.35.jar commons-csv-1.11.0.j
+ ar junit-platform-commons-1.8.1.jar pdfbox-debugger-3.0.2.jar mxnet-mod
+ el-zoo-0.28.0.jar osgi-resource-locator-1.0.3.jar jersey-media-json-jac
+ kson-2.35.jar model-zoo-0.28.0.jar jackson-module-jaxb-annotations-2.14
+ .0.jar tess4j-5.12.0.jar opentest4j-1.2.0.jar hk2-utils-2.6.1.jar gson-
+ 2.10.1.jar lept4j-1.19.1.jar jersey-common-2.35.jar jakarta.xml.bind-ap
+ i-2.3.3.jar pdfbox-tools-3.0.2.jar jbig2-imageio-3.0.4.jar commons-cli-
+ 1.8.0.jar jackson-databind-2.14.0.jar hk2-api-2.6.1.jar telegrambots-me
+ ta-6.5.0.jar jersey-client-2.35.jar commons-io-2.16.1.jar log4j-core-2.
+ 20.0.jar pytorch-engine-0.28.0.jar jersey-server-2.35.jar httpmime-4.5.
+ 13.jar fontbox-3.0.2.jar jakarta.ws.rs-api-2.1.6.jar junit-platform-eng
+ ine-1.8.1.jar aspose-ocr-24.6.1.jar commons-lang3-3.12.0.jar pdfbox-3.0
+ .2.jar commons-compress-1.26.1.jar jakarta.inject-2.6.1.jar jackson-jax
+ rs-base-2.14.0.jar jna-5.14.0.jar commons-codec-1.16.1.jar javassist-3.
+ 25.0-GA.jar jackson-jaxrs-json-provider-2.14.0.jar log4j-api-2.20.0.jar
+  jakarta.activation-api-1.2.2.jar basicdataset-0.28.0.jar jackson-core-
+ 2.14.0.jar httpclient-4.5.13.jar picocli-4.7.5.jar pytorch-model-zoo-0.
+ 28.0.jar examples-0.6.0.jar jakarta.validation-api-2.0.2.jar
+
